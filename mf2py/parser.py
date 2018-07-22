@@ -105,10 +105,9 @@ class Parser(object):
                     doc = data.content
 
         if doc is not None:
-            self.__doc__ = doc
             if isinstance(doc, BeautifulSoup) or isinstance(doc, Tag):
                 # make a deepcopy of the doc to not change original; also copy the HTML builder
-                self.__doc__ = copy.deepcopy(doc)
+                self.__doc__ = copy.copy(doc)
                 self.__doc__.builder = doc.builder
             else:
                 try:
