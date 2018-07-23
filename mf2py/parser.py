@@ -7,7 +7,7 @@ from bs4.element import Tag
 from . import backcompat, mf2_classes, implied_properties, parse_property
 from . import temp_fixes
 from .version import __version__
-from .dom_helpers import get_attr, get_children, get_descendents
+from .dom_helpers import get_attr, get_children, get_descendents, deepcopy_tag
 from .mf_helpers import unordered_list
 
 import json
@@ -105,10 +105,12 @@ class Parser(object):
                     doc = data.content
 
         if doc is not None:
-            if isinstance(doc, BeautifulSoup) or isinstance(doc, Tag):
-                # make a deepcopy of the doc to not change original; also copy the HTML builder
+            if isinstance(doc, BeautifulSoup):
+                # make a copy of the doc to not change original;
+                #this safely regenerates all children too, but is inefficient (serializes and parses again(
                 self.__doc__ = copy.copy(doc)
-                self.__doc__.builder = doc.builder
+            elif isinstance(doc, Tag):
+                self.__doc__ = deepcopy_tag(doc)
             else:
                 try:
                     # try the user-given html parser or default html5lib
